@@ -1,10 +1,23 @@
 """
-Self-destruct for Rasperry Pi 
-including disabling comms, SD card overwrite, CPU overclocking, physical destruction of SD card, and short-circuiting the board 
+Self-destruct for Raspberry Pi
+
+(This is a novelty project after watching too many Mission Impossibles)
+
+The self-destruct sequence starts with disabling all comms (USB, ssh, eth, etc),
+then moves on to burning the SD card and short-circuiting the board,
+if it's somehow still alive it starts overclocking the CPU and overwriting data.
+
+Materials Required:
+- Raspberry Pi
+- Jumper cables
+- Nichrome wire
+- Two MOSFET transistors or relay switches
+- Optionally a cotton ball
 """
 import os
-import time
 import sys
+import time
+
 import RPi.GPIO as GPIO
 
 SAFE_MODE = True  # Set to False to enable real destruction
@@ -22,7 +35,7 @@ GPIO.setup(GPIO_BOARD_SHORT, GPIO.OUT)
 def countdown_timer(seconds=100):
     print("\n**WARNING! SELF-DESTRUCTION INITIATED!**")
     print("\tCTRL+C to cancel\n")
-    
+
     for i in range(seconds, 0, -1):
         bar = "#" * (i // 2) + "-" * ((seconds // 2) - (i // 2))
         sys.stdout.write(f"\rSeconds Remaining: [{bar}] {i}")
@@ -66,7 +79,7 @@ def overclock_cpu():
         print("SAFE MODE: CPU overclocking is disabled.")
 
 
-# Ignite SD Card (Nichrome Wire)
+# Ignite SD Card (Nichrome Wire + Cotton Ball)
 def ignite_sd_card():
     print("Igniting SD Card with Nichrome Wire...")
     if not SAFE_MODE:
@@ -88,7 +101,7 @@ def short_circuit_board():
         print("SAFE MODE: Board short-circuit is disabled.")
 
 
-# Kernel Panic (in case it's not alerady dead)
+# Kernel Panic (in case it's not already dead)
 def trigger_kernel_panic():
     print("Triggering Kernel Panic...")
     if not SAFE_MODE:
@@ -100,22 +113,21 @@ def trigger_kernel_panic():
 def main():
     countdown_timer()
     print("Raspberry Pi Self-Destruction Sequence Initiated")
-    
+
+    # Stage 1 
     disable_network_usb()  # Prevent override
-    
-    overwrite_sd_card()  # Start SD card overwrite
-    
-    overclock_cpu()  # Overheat CPU
-    time.sleep(10)  # Allow software destruction to run
 
+    # Stage 2
     ignite_sd_card()  # Burn SD card
-    time.sleep(5)
-
     short_circuit_board()  # Kill power
-    time.sleep(5)
 
+    # Stage 3 (if still operational)
+    overwrite_sd_card()  # Start SD card overwrite
+    overclock_cpu()  # Overheat CPU
+    time.sleep(10)
+
+    # Stage 4
     trigger_kernel_panic()  # Final OS crash (if still running)
-    
     GPIO.cleanup()  # Reset GPIO pins
 
 
